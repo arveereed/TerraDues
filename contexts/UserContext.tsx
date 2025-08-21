@@ -1,5 +1,5 @@
 import { getUserById } from "@/services/userService";
-import { UserType } from "@/types";
+import { FireStoreUser } from "@/types";
 import { useUser } from "@clerk/clerk-expo";
 import {
   createContext,
@@ -10,7 +10,7 @@ import {
 } from "react";
 
 type UserContextType = {
-  user: UserType | null;
+  user: FireStoreUser | null;
   setUser: React.Dispatch<React.SetStateAction<any>>;
   setRefetchUserData: React.Dispatch<React.SetStateAction<any>>;
 };
@@ -19,7 +19,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { isSignedIn, user: clerkUser } = useUser();
-  const [user, setUser] = useState<UserType | null>(null);
+  const [user, setUser] = useState<FireStoreUser | null>(null);
   const [refetch, setRefetchUserData] = useState(false);
 
   useEffect(() => {
@@ -33,6 +33,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
         if (userData) {
           setUser({
+            id: userData.id,
+            createdAt: userData.createdAt,
             user_id: userData.user_id,
             fullName: userData.fullName,
             address: userData.address,

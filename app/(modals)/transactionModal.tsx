@@ -6,6 +6,7 @@ import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useUserContext } from "@/contexts/UserContext";
 import { addNewTransaction } from "@/services/transactionService";
+import { updateMakeTransaction } from "@/services/userService";
 import { scale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -18,7 +19,7 @@ type OptionsType = {
 };
 
 export default function transactionModal() {
-  const { user } = useUserContext();
+  const { user, setRefetchUserData } = useUserContext();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -28,6 +29,7 @@ export default function transactionModal() {
     month: "long",
     day: "numeric",
   };
+  const formattedDate = today.toLocaleDateString(undefined, options as {});
 
   const handleCreateTransaction = async () => {
     setLoading(true);
@@ -36,6 +38,8 @@ export default function transactionModal() {
       setLoading(false);
       router.back();
     }
+    await updateMakeTransaction(user?.id as string, false);
+    setRefetchUserData((prev: boolean) => !prev);
   };
 
   return (
@@ -55,9 +59,7 @@ export default function transactionModal() {
           <Typo size={16}>Payment Transaction: Bayad Center</Typo>
           <Typo size={16}>Monthly Due: &#8369;300.00</Typo>
           <Typo size={16}>Total Pay: &#8369;300.00</Typo>
-          <Typo size={16}>
-            Date: {today.toLocaleDateString(undefined, options as {})}
-          </Typo>
+          <Typo size={16}>Date: {formattedDate}</Typo>
         </ScrollView>
       </View>
 

@@ -44,12 +44,17 @@ export interface CustomButtonProps extends TouchableOpacityProps {
 }
 
 export type UserType = {
+  createdAt: object;
   fullName: string;
   email: string;
   address: string;
   user_id: string;
   role: string;
   makeTransaction: boolean;
+};
+
+export type FireStoreUser = UserType & {
+  id: string;
 };
 
 export type UserDataSignUpType = {

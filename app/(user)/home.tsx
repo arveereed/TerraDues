@@ -31,10 +31,11 @@ export default function home() {
 
   useEffect(() => {
     loadData();
-    // console.log(JSON.stringify(user, null, 2));
   }, [loadData]);
 
   if (!user) return <SkeletonScreen />;
+
+  // * TODO: trigger makeTransaction base on date
 
   const getNextMonthlyDate = (dayOfMonth: number) => {
     // * sample hard coded, new Date(2025, 7, 15); August 15, 2025
