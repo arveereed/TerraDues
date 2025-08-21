@@ -59,7 +59,7 @@ export const getTransactionsByUserId = async (userId: string | undefined) => {
 
     const queryStatusSnapshot = await getDocs(statusQ);
 
-    if (!querySnapshot.empty && !queryStatusSnapshot.empty) {
+    if (!querySnapshot.empty || !queryStatusSnapshot.empty) {
       let summary = 0;
       const total = queryStatusSnapshot.docs.map((doc) => {
         const data = doc.data();

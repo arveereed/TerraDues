@@ -17,6 +17,7 @@ export const addUser = async (userData: UserDataSignUpType) => {
       ...userData,
       createdAt: Timestamp.now(),
       role: "User",
+      makeTransaction: true,
     });
   } catch (error) {
     console.error("Error adding user: ", error);

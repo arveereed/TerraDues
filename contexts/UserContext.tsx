@@ -12,6 +12,7 @@ import {
 type UserContextType = {
   user: UserType | null;
   setUser: React.Dispatch<React.SetStateAction<any>>;
+  setRefetchUserData: React.Dispatch<React.SetStateAction<any>>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -19,6 +20,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { isSignedIn, user: clerkUser } = useUser();
   const [user, setUser] = useState<UserType | null>(null);
+  const [refetch, setRefetchUserData] = useState(false);
 
   useEffect(() => {
     let isMounted = true; // ✅ flag to prevent state updates after unmount
@@ -36,6 +38,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             address: userData.address,
             email: userData.email,
             role: userData.role,
+            makeTransaction: userData.makeTransaction,
           });
         }
       };
@@ -45,10 +48,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       isMounted = false; // ✅ cleanup flag
     };
-  }, [isSignedIn, clerkUser]);
+  }, [isSignedIn, clerkUser, refetch]);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, setRefetchUserData }}>
       {children}
     </UserContext.Provider>
   );

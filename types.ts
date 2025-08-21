@@ -49,6 +49,7 @@ export type UserType = {
   address: string;
   user_id: string;
   role: string;
+  makeTransaction: boolean;
 };
 
 export type UserDataSignUpType = {

@@ -15,25 +15,46 @@ import { useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 export default function home() {
-  const { user } = useUserContext();
-  const router = useRouter();
-  const [refreshing, setRefreshing] = useState<boolean>(false);
-
+  const { user, setRefetchUserData } = useUserContext();
   const { loadData, isLoading, transactions } = useTransactions(user?.user_id);
+  const router = useRouter();
+
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const onRefresh = async () => {
     setRefreshing(true);
     // console.log("Transaction: ", JSON.stringify(transactions, null, 2));
     await loadData();
+    setRefetchUserData((prev: boolean) => !prev);
     setRefreshing(false);
   };
 
   useEffect(() => {
     loadData();
-    console.log("Transaction: ", transactions);
+    // console.log(JSON.stringify(user, null, 2));
   }, [loadData]);
 
   if (!user) return <SkeletonScreen />;
+
+  const getNextMonthlyDate = (dayOfMonth: number) => {
+    // * sample hard coded, new Date(2025, 7, 15); August 15, 2025
+    const today = new Date();
+    let next = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
+
+    // if today has already passed that day, go to next month
+    if (today > next) {
+      next.setMonth(next.getMonth() + 1);
+    }
+
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "short",
+    } as const;
+
+    return next.toLocaleDateString("en-US", options);
+  };
 
   return (
     <ScreenWrapper>
@@ -48,12 +69,15 @@ export default function home() {
         <View style={styles.row}>
           <View>
             <Text style={styles.label}>Upcoming Payment:</Text>
-            <Text style={styles.subText}>April 20, 2025, Sun</Text>
+            <Text style={styles.subText}>{getNextMonthlyDate(19)}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.label}>Last Payment:</Text>
             <Text style={styles.subText}>
-              {transactions?.transactions[0]?.updatedAt}
+              {transactions?.transactions[0]?.updatedAt.split(" at ")[0]}
+            </Text>
+            <Text style={{ color: colors.neutral400 }}>
+              {transactions?.transactions[0]?.updatedAt.split(" at ")[1]}
             </Text>
           </View>
         </View>
@@ -81,17 +105,19 @@ export default function home() {
             ListEmptyComponent={<Typo>No transactions found</Typo>}
           />
         )}
-        <Button
-          style={styles.floatingButton}
-          onPress={() => router.push("/(modals)/transactionModal")}
-        >
-          <Ionicons
-            name="add"
-            color={colors.white}
-            weight="bold"
-            size={verticalScale(28)}
-          />
-        </Button>
+        {user?.makeTransaction && (
+          <Button
+            style={styles.floatingButton}
+            onPress={() => router.push("/(modals)/transactionModal")}
+          >
+            <Ionicons
+              name="add"
+              color={colors.white}
+              weight="bold"
+              size={verticalScale(28)}
+            />
+          </Button>
+        )}
       </View>
     </ScreenWrapper>
   );
@@ -127,6 +153,7 @@ const styles = StyleSheet.create({
   label: {
     color: "#ffffff",
     fontSize: 13,
+    marginBottom: 3,
   },
   amount: {
     color: "#ffffff",
