@@ -44,6 +44,7 @@ export interface CustomButtonProps extends TouchableOpacityProps {
 }
 
 export type UserType = {
+  id: string;
   createdAt: object;
   fullName: string;
   email: string;
@@ -79,13 +80,7 @@ export type HeaderProps = {
 
 export type TransactionType = {
   id: string;
-  userData: {
-    address: string;
-    email: string;
-    fullName: string;
-    role: string;
-    user_id: string;
-  };
+  userData: UserType;
   user_id: string;
   totalPay: number;
   createdAt: string;

@@ -1,5 +1,6 @@
 import { colors } from "@/constants/theme";
 import { updateStatus } from "@/services/transactionService";
+import { updateMakeTransaction } from "@/services/userService";
 import { TransactionType } from "@/types";
 import React, { useState } from "react";
 import {
@@ -22,6 +23,9 @@ export default function HistoryItem({ item }: { item: TransactionType }) {
 
   const handleStatus = async (option: string) => {
     await updateStatus(item.id, option);
+    if (!item.userData.makeTransaction && newStatus === "UNPAID") {
+      await updateMakeTransaction(item.userData.id, true);
+    }
   };
 
   return (

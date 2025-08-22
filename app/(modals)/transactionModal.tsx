@@ -7,6 +7,7 @@ import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useUserContext } from "@/contexts/UserContext";
 import { addNewTransaction } from "@/services/transactionService";
 import { updateMakeTransaction } from "@/services/userService";
+import { UserType } from "@/types";
 import { scale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -33,7 +34,23 @@ export default function transactionModal() {
 
   const handleCreateTransaction = async () => {
     setLoading(true);
-    const success = await addNewTransaction(300, user?.user_id, user);
+
+    const userData = {
+      id: user?.id,
+      createdAt: user?.createdAt,
+      fullName: user?.fullName,
+      email: user?.email,
+      address: user?.address,
+      user_id: user?.user_id,
+      role: user?.role,
+      makeTransaction: false,
+    };
+
+    const success = await addNewTransaction(
+      300,
+      user?.user_id,
+      userData as UserType
+    );
     if (success) {
       setLoading(false);
       router.back();

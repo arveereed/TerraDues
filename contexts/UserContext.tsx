@@ -20,7 +20,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { isSignedIn, user: clerkUser } = useUser();
   const [user, setUser] = useState<FireStoreUser | null>(null);
-  const [refetch, setRefetchUserData] = useState(false);
+  const [refetchUserData, setRefetchUserData] = useState(false);
 
   useEffect(() => {
     let isMounted = true; // ✅ flag to prevent state updates after unmount
@@ -50,7 +50,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       isMounted = false; // ✅ cleanup flag
     };
-  }, [isSignedIn, clerkUser, refetch]);
+  }, [isSignedIn, clerkUser, refetchUserData]);
 
   return (
     <UserContext.Provider value={{ user, setUser, setRefetchUserData }}>
