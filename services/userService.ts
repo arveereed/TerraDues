@@ -9,6 +9,7 @@ import {
   Timestamp,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 
 export const addUser = async (userData: UserDataSignUpType) => {
@@ -37,7 +38,7 @@ export const getUserById = async (
 
     if (!querySnapshot.empty) {
       const docSnap = querySnapshot.docs[0];
-      return { id: docSnap.id, ...(docSnap.data() as UserType) };
+      return { ...(docSnap.data() as UserType), id: docSnap.id };
     }
 
     console.warn(`No user found with ID: ${userId}`);
@@ -45,6 +46,33 @@ export const getUserById = async (
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;
+  }
+};
+
+export const allowAllUsersToMakeTransaction = async () => {
+  try {
+    const usersCollection = collection(db, "users");
+    const querySnapshot = await getDocs(usersCollection);
+
+    if (querySnapshot.empty) {
+      console.log("No users found.");
+      return;
+    }
+
+    const batch = writeBatch(db);
+
+    querySnapshot.forEach((document) => {
+      const data = document.data();
+      if (data.role === "User") {
+        const userRef = doc(db, "users", document.id);
+        batch.update(userRef, { makeTransaction: true });
+      }
+    });
+
+    await batch.commit();
+    console.log("All users updated successfully ✅");
+  } catch (error) {
+    console.error("Error updating all users:", error);
   }
 };
 

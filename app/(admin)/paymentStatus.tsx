@@ -1,13 +1,18 @@
 import HistoryItem from "@/components/admin/HistoryItem";
+import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors } from "@/constants/theme";
 import { useAdminTransactions } from "@/hooks/useAdminTransactions";
+import { allowAllUsersToMakeTransaction } from "@/services/userService";
 import { TransactionType } from "@/types";
+import { verticalScale } from "@/utils/styling";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   RefreshControl,
   StyleSheet,
@@ -19,6 +24,7 @@ import {
 
 export default function PaymentStatusScreen() {
   const { loadData, transactions, isLoading } = useAdminTransactions();
+  const router = useRouter();
 
   // console.log(JSON.stringify(transactions, null, 2));
   const [search, setSearch] = useState("");
@@ -46,6 +52,21 @@ export default function PaymentStatusScreen() {
     setRefreshing(true);
     await loadData();
     setRefreshing(false);
+  };
+
+  const handleCreateTransaction = () => {
+    Alert.alert(
+      "Make Transaction",
+      "Are you sure do you want to allow residents to make a transaction for this month?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          style: "destructive",
+          onPress: async () => await allowAllUsersToMakeTransaction(),
+        },
+      ]
+    );
   };
 
   return (
@@ -126,6 +147,14 @@ export default function PaymentStatusScreen() {
         ) : (
           <Loading />
         )}
+        <Button style={styles.floatingButton} onPress={handleCreateTransaction}>
+          <Ionicons
+            name="add"
+            color={colors.white}
+            weight="bold"
+            size={verticalScale(28)}
+          />
+        </Button>
       </View>
     </ScreenWrapper>
   );
@@ -180,4 +209,13 @@ const styles = StyleSheet.create({
   dropdownText: { fontSize: 14, color: "black" },
   activeDropdownItem: { backgroundColor: "#0f5132", borderRadius: 6 },
   activeDropdownText: { color: colors.white, fontWeight: "bold" },
+
+  floatingButton: {
+    height: verticalScale(50),
+    width: verticalScale(50),
+    borderRadius: 100,
+    position: "absolute",
+    bottom: verticalScale(30),
+    right: verticalScale(30),
+  },
 });
